@@ -63,7 +63,7 @@ class Graph {
 	ensureEdge(from, to, kind) {
 		for (var i=0;i<this.edges.length;i++) {
 			var ce = this.edges[i];
-			if (ce.from == e.from && ce.from == e.from)
+			if (ce.from == from && ce.to == to)
 				return;
 		}
 		this.edges.push(new Edge(from, to, kind));
