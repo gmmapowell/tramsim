@@ -34,14 +34,13 @@ class Render {
 		var wid = edge.kind.width;
 		var dx = edge.to.x - edge.from.x;
 		var dy = edge.to.y - edge.from.y;
-		var lines;
-		if (dy == 0) { // horizontal parallel lines are a special case ...
-			lines = [
-				[ edge.from.x, edge.from.y + wid/2, edge.to.x, edge.to.y + wid /2 ],
-				[ edge.from.x, edge.from.y - wid/2, edge.to.x, edge.to.y - wid / 2]
-			];
-		} else
-			debugger;
+		var normalAngle = Math.atan2(dx, dy); // using dx and dy the "other way around" to find the normal
+		var xdisp = wid*Math.cos(normalAngle) / 2;
+		var ydisp = wid*Math.sin(normalAngle) / 2;
+		var lines = [
+			[ edge.from.x - xdisp, edge.from.y + ydisp, edge.to.x - xdisp, edge.to.y + ydisp ],
+			[ edge.from.x + xdisp, edge.from.y - ydisp, edge.to.x + xdisp, edge.to.y - ydisp ]
+		];
 
 		for (var i=0;i<lines.length;i++) {
 			var line = lines[i];
