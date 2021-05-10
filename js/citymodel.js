@@ -20,7 +20,7 @@ class Graph {
 		this.edges = [];
 	}
 
-	add(from, to, kind) {
+	road(from, to, kind) {
 		// from and to are both nodes
 		// ensure we have them
 		// add an edge between them
@@ -28,6 +28,12 @@ class Graph {
 		from = this.ensureNode(from);
 		to = this.ensureNode(to);
 		this.ensureEdge(from, to, kind);
+	}
+
+	circus(center, radius) {
+		// a circus is a circular intersection at a particular point of a given size
+		center = this.ensureNode(center);
+		center.specificKind(new Circus(radius));
 	}
 
 	simplify() {
@@ -44,6 +50,9 @@ class Graph {
 		var render = new Render(canvas.getContext("2d"), canvas.width, canvas.height, centerX, centerY, scale);
 		for (var i=0;i<this.edges.length;i++) {
 			render.edge(this.edges[i]);
+		}
+		for (var i=0;i<this.nodes.length;i++) {
+			render.node(this.nodes[i]);
 		}
 	}
 
@@ -77,6 +86,15 @@ class Node {
 	constructor(x, y) {
 		this.x = x;
 		this.y = y;
+		this.kind = null;
+	}
+
+	specificKind(what) {
+		this.kind = what;
+	}
+
+	toString() {
+		return "["+ this.x +"," + this.y +"]";
 	}
 }
 
@@ -86,10 +104,27 @@ class Edge {
 		this.to = to;
 		this.kind = kind;
 	}
+
+	toString() {
+		return this.kind + "{" + this.from + "=>" + this.to +"}";
+	}
 }
 
 class Boulevarde {
 	constructor() {
 		this.width = 15; // 15m wide, enough for 7 tram tracks with a metre over, but more realistically four + pavements & a median
+	}
+	toString() {
+		return "Boulevarde";
+	}
+}
+
+class Circus {
+	constructor(radius) {
+		this.radius = radius;
+	}
+
+	render(node, r) {
+		r.circle(node.x, node.y, this.radius);
 	}
 }

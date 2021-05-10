@@ -1,3 +1,8 @@
 .layout {
 	border: 1px solid black;
 }
+
+.junctionMap {
+	/* display: none; */
+	display: block;
+}

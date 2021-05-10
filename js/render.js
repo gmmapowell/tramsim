@@ -27,6 +27,12 @@ class Render {
 		};
 	}
 
+	node(node) {
+		if (node.kind) {
+			node.kind.render(node, this);
+		}
+	}
+
 	edge(edge) {
 		// in order to draw two lines "width" apart, we need to calculate the normal to the line
 		// NOTE: I really feel this is the edge's responsibility since it is all in city space
@@ -51,5 +57,14 @@ class Render {
 			this.gc.lineTo(to.x, to.y);
 			this.gc.stroke();
 		}
+	}
+
+	circle(x, y, r) {
+		this.gc.beginPath();
+		var center = this.mapCoord(x, y);
+		this.gc.arc(center.x, center.y, r*scale, 0, 2*Math.PI);
+		this.gc.fillStyle = 'white';
+		this.gc.fill();
+		this.gc.stroke();
 	}
 }
