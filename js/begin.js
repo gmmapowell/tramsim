@@ -7,5 +7,9 @@ function begin() {
 	panX = city.wid/2;
 	panY = city.ht/2;
 	scale = 1;
+	renderNow();
+}
+
+function renderNow() {
 	city.renderInto(drawAs, panX, panY, scale);
 }

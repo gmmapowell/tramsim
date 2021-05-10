@@ -6,6 +6,8 @@ class Render {
 		this.centerX = centerX;
 		this.centerY = centerY;
 		this.scale = scale;
+
+		this.gc.clearRect(0, 0, cw, ch);
 	}
 
 	mapCoord(cityX, cityY) {
@@ -45,6 +47,7 @@ class Render {
 			var line = lines[i];
 			var from = this.mapCoord(line[0], line[1]);
 			var to = this.mapCoord(line[2], line[3]);
+			this.gc.beginPath();
 			this.gc.moveTo(from.x, from.y);
 			this.gc.lineTo(to.x, to.y);
 			this.gc.stroke();
