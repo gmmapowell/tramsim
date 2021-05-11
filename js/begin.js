@@ -14,6 +14,5 @@ function begin() {
 }
 
 function renderNow() {
-	junctions.show(document.getElementById("junctionMap"));
 	city.renderInto(drawAs, panX, panY, scale);
 }
