@@ -29,25 +29,21 @@ class Render {
 
 	node(node) {
 		if (node.kind) {
-			node.kind.render(node, this);
+			this.renderLines(node.kind.lines());
 		}
 	}
 
 	edge(edge) {
 		// in order to draw two lines "width" apart, we need to calculate the normal to the line
 		// NOTE: I really feel this is the edge's responsibility since it is all in city space
-		// and is therefore needed for the grid
-		var wid = edge.kind.width;
-		var dx = edge.to.x - edge.from.x;
-		var dy = edge.to.y - edge.from.y;
-		var normalAngle = Math.atan2(dx, dy); // using dx and dy the "other way around" to find the normal
-		var xdisp = wid*Math.cos(normalAngle) / 2;
-		var ydisp = wid*Math.sin(normalAngle) / 2;
-		var lines = [
-			[ edge.from.x - xdisp, edge.from.y + ydisp, edge.to.x - xdisp, edge.to.y + ydisp ],
-			[ edge.from.x + xdisp, edge.from.y - ydisp, edge.to.x + xdisp, edge.to.y - ydisp ]
-		];
+		// ask the edge to tell us the lines (in city space) we should draw
+		// both nodes (junctions) and edges can return an arbitrary number of lines; just draw them all
 
+		this.renderLines(edge.lines());
+	}
+
+	renderLines(lines) {
+		// TODO: a line can also be an arc
 		for (var i=0;i<lines.length;i++) {
 			var line = lines[i];
 			var from = this.mapCoord(line[0], line[1]);
@@ -59,12 +55,12 @@ class Render {
 		}
 	}
 
-	circle(x, y, r) {
-		this.gc.beginPath();
-		var center = this.mapCoord(x, y);
-		this.gc.arc(center.x, center.y, r*scale, 0, 2*Math.PI);
-		this.gc.fillStyle = 'white';
-		this.gc.fill();
-		this.gc.stroke();
-	}
+	// circle(x, y, r) {
+	// 	this.gc.beginPath();
+	// 	var center = this.mapCoord(x, y);
+	// 	this.gc.arc(center.x, center.y, r*scale, 0, 2*Math.PI);
+	// 	this.gc.fillStyle = 'white';
+	// 	this.gc.fill();
+	// 	this.gc.stroke();
+	// }
 }

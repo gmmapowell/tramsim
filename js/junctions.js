@@ -57,8 +57,8 @@ class JunctionFinder {
 					continue;
 				if (!inRange(meety, edge1.from.y, edge1.to.y) || !inRange(meety, edge2.from.y, edge2.to.y))
 					continue;
-				console.log("meets at", meetx, meety);
-				this.city.circus(new Node(meetx, meety), 25);
+				// console.log("meets at", meetx, meety);
+				this.city.intersection(new Node(meetx, meety), 25);
 			}
 		}
 	}

@@ -1,10 +1,8 @@
 // The initial plan is to model the city by using a graph of nodes and edges
 // All streets run in segments (edges) between intersections (nodes).  In this sense, no edges should cross.
-// We have three parallel models: 
-//  * the node/edge graph (the ultimate source of truth)
-//  * a fine grid representation that allows us to recognize in memory that two edges cross and we need a new intersection
-//  * the visual representation on the canvas
-// We can recalculate the latter two at any time (and at any scale) from the node/edge graph
+// The model is a set of nodes and edges, enhanced to know that the edges have width and the nodes are "intersections"
+// We can then manipulate this to find all the junctions and correctly recalibrate
+// We can then draw this onto a canvas at any level of scale on demand.
 
 // This model assumes the world is incredibly flat.  There are no hills, bridges or tunnels in the city plan.
 
@@ -34,6 +32,13 @@ class Graph {
 		// a circus is a circular intersection at a particular point of a given size
 		center = this.ensureNode(center);
 		center.specificKind(new Circus(radius));
+	}
+
+	intersection(center, radius) {
+		// a circus is a circular intersection at a particular point of a given size
+		center = this.ensureNode(center);
+		if (!center.kind)
+			center.specificKind(new Intersection());
 	}
 
 	simplify() {
@@ -105,6 +110,19 @@ class Edge {
 		this.kind = kind;
 	}
 
+	lines() {
+		var wid = this.kind.width;
+		var dx = this.to.x - this.from.x;
+		var dy = this.to.y - this.from.y;
+		var normalAngle = Math.atan2(dx, dy); // using dx and dy the "other way around" to find the normal
+		var xdisp = wid*Math.cos(normalAngle) / 2;
+		var ydisp = wid*Math.sin(normalAngle) / 2;
+		return [
+			[ this.from.x - xdisp, this.from.y + ydisp, this.to.x - xdisp, this.to.y + ydisp ],
+			[ this.from.x + xdisp, this.from.y - ydisp, this.to.x + xdisp, this.to.y - ydisp ]
+		];
+	}
+
 	toString() {
 		return this.kind + "{" + this.from + "=>" + this.to +"}";
 	}
@@ -119,12 +137,36 @@ class Boulevarde {
 	}
 }
 
+class Avenue {
+	constructor() {
+		this.width = 10; // 10m wide
+	}
+	toString() {
+		return "Avenue";
+	}
+}
+
+class Road {
+	constructor() {
+		this.width = 5; // 5m wide, big enough for two tram tracks but no platforms
+	}
+	toString() {
+		return "Road";
+	}
+}
+
+class Intersection {
+	lines() {
+		return [];
+	}
+}
+
 class Circus {
 	constructor(radius) {
 		this.radius = radius;
 	}
 
-	render(node, r) {
-		r.circle(node.x, node.y, this.radius);
+	lines() {
+		return [];
 	}
 }
