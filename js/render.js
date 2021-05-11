@@ -39,6 +39,7 @@ class Render {
 		// ask the edge to tell us the lines (in city space) we should draw
 		// both nodes (junctions) and edges can return an arbitrary number of lines; just draw them all
 
+		console.log("rendering " + edge);
 		this.renderLines(edge.lines());
 	}
 

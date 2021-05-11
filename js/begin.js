@@ -9,7 +9,7 @@ function begin() {
 	junctions.resolve();
 	panX = city.wid/2;
 	panY = city.ht/2;
-	scale = 1;
+	scale = 0.25;
 	renderNow();
 }
 

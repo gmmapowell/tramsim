@@ -34,11 +34,12 @@ class Graph {
 		center.specificKind(new Circus(radius));
 	}
 
-	intersection(center, radius) {
+	intersection(center) {
 		// a circus is a circular intersection at a particular point of a given size
 		center = this.ensureNode(center);
 		if (!center.kind)
 			center.specificKind(new Intersection());
+		return center;
 	}
 
 	simplify() {
@@ -53,11 +54,17 @@ class Graph {
 		// and the whole canvas would be filled with city X values from 700 to 1300 and Y from 700 to 1100.
 
 		var render = new Render(canvas.getContext("2d"), canvas.width, canvas.height, centerX, centerY, scale);
+		var offset = 0;
+		var self = this;
 		for (var i=0;i<this.edges.length;i++) {
-			render.edge(this.edges[i]);
+			(function(j) {
+				setTimeout(() => render.edge(self.edges[j]), offset++*500);
+			})(i);
 		}
 		for (var i=0;i<this.nodes.length;i++) {
-			render.node(this.nodes[i]);
+			(function(j) {
+				setTimeout(() => render.node(self.nodes[j]), offset++*500);
+			})(i);
 		}
 	}
 
@@ -99,7 +106,7 @@ class Node {
 	}
 
 	toString() {
-		return "["+ this.x +"," + this.y +"]";
+		return (this.kind?this.kind.toString():"") + "["+ this.x +"," + this.y +"]";
 	}
 }
 
@@ -159,6 +166,10 @@ class Intersection {
 	lines() {
 		return [];
 	}
+
+	toString() {
+		return "Intersection";
+	}
 }
 
 class Circus {
@@ -168,5 +179,9 @@ class Circus {
 
 	lines() {
 		return [];
+	}
+
+	toString() {
+		return "Circus";
 	}
 }

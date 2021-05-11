@@ -41,7 +41,7 @@ class JunctionFinder {
 				} else if (slope2 == Infinity) { // second is vertical
 					var xdiff = edge2.from.x - edge1.from.x;
 					var ydiff = xdiff * slope1;
-					meetx = edge1.from.x;
+					meetx = edge2.from.x;
 					meety = ydiff + edge1.from.y;
 				} else {
 					// all the remaining cases need to consider both slopes and whether they cross before they run out of room
@@ -53,12 +53,24 @@ class JunctionFinder {
 					meetx = (c2 - c1) / (slope1 - slope2);
 					meety = slope1*meetx + c1;
 				}
+				meetx = Math.round(meetx);
+				meety = Math.round(meety);
 				if (!inRange(meetx, edge1.from.x, edge1.to.x) || !inRange(meetx, edge2.from.x, edge2.to.x))
 					continue;
 				if (!inRange(meety, edge1.from.y, edge1.to.y) || !inRange(meety, edge2.from.y, edge2.to.y))
 					continue;
-				// console.log("meets at", meetx, meety);
-				this.city.intersection(new Node(meetx, meety), 25);
+				// console.log(edge1.toString(), edge2.toString(), "meet at", meetx, meety);
+				var midpoint = this.city.intersection(new Node(meetx, meety));
+				if ((edge1.from.x != midpoint.x || edge1.from.y != midpoint.y) && (edge1.to.x != midpoint.x || edge1.to.y != midpoint.y)) {
+					console.log("need to split " + edge1 + " at " + midpoint);
+					this.city.road(midpoint, edge1.to, edge1.kind);
+					edge1.to = midpoint; // adjust existing one in place
+				}
+				if ((edge2.from.x != midpoint.x || edge2.from.y != midpoint.y) && (edge2.to.x != midpoint.x || edge2.to.y != midpoint.y)) {
+					console.log("need to split " + edge2 + " at " + midpoint);
+					this.city.road(midpoint, edge2.to, edge2.kind);
+					edge2.to = midpoint; // adjust existing one in place
+				}
 			}
 		}
 	}
