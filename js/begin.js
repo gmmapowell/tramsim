@@ -7,6 +7,7 @@ function begin() {
 	designCity();
 	junctions = new JunctionFinder(city);
 	junctions.resolve();
+	junctions.layOut();
 	panX = city.wid/2;
 	panY = city.ht/2;
 	scale = 0.25;

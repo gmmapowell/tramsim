@@ -7,6 +7,8 @@ class JunctionFinder {
 		this.city = city;
 	}
 
+	// find all the places in the city where the roads intersect and break them there
+	// I think this should also find all the places where explicit nodes break roads but it does not currently
 	resolve() {
 		// take each pair of edges and see if they cross and where
 		for (var ei=0;ei<this.city.edges.length;ei++) {
@@ -75,13 +77,71 @@ class JunctionFinder {
 		}
 	}
 
+	// once we have identified all the intersections, lay them out ...
+	// The strategy here is:
+	//  * We know where all the intersections are
+	//  * We can ask the city about the edges that cross there
+	//  * For each of these we can determine the angle from 0 to 2π
+	//  * Thus we can place them in a circle, all of which have one end at the given node
+	//  * We can ask the edge kind to give us the two parallel lines
+	//     - called "left" and "right" from the perspective of arriving lines
+	//  * The second one together with the first of the next edge need to have a clean connection
+	//  * We tell each edge where the line goes
+	//  * The first line of the first edge and the second line of the last edge make the final pair
+	layOut() {
+		for (var i=0;i<this.city.nodes.length;i++) {
+			this.layOutNode(this.city.nodes[i]);
+		}
+	}
+
+	layOutNode(n) {
+		var edges = this.city.edgesAt(n);
+		console.log(n + " has " + edges.length);
+		if (edges.length == 1) {
+			var e = edges[0];
+			e.leftEndsAt(n, dest(e.leftLine(n)));
+			e.rightEndsAt(n, dest(e.rightLine(n)));
+			// TODO: cap it
+			return;
+		}
+		var as = [];
+		for (var i=0;i<edges.length;i++) {
+			var e = edges[i];
+			var ang;
+			if (e.to == n)
+				ang = Math.atan2(e.from.y-e.to.y, e.from.x-e.to.x);
+			else
+				ang = Math.atan2(e.to.y-e.from.y, e.to.x-e.from.x);
+			console.log("have " + e + " at " + ang);
+			as.push({ ang, e });
+		}
+
+		as.sort((x,y) => { return x.ang < y.ang ? -1 : 1; });
+		console.log("sorted as", as);
+
+		for (var i=0;i<as.length;i++) {
+			var ase = as[i];
+			var nxe;
+			if (i+1 == as.length)
+				nxe = as[0];
+			else
+				nxe = as[i+1];
+			var fst = ase.e.rightLine(n);
+			var snd = nxe.e.leftLine(n);
+			var posn = linesIntersect(fst, snd);
+			console.log(fst + " and " + snd + " meet at " + JSON.stringify(posn));
+			if (!posn) {
+				// they don't meet; reflect their ends back to them
+				ase.e.rightEndsAt(n, dest(fst));
+				nxe.e.leftEndsAt(n, dest(snd));
+			} else {
+				ase.e.rightEndsAt(n, posn);
+				nxe.e.leftEndsAt(n, posn);
+			}
+		}
+	}
 }
 
-function inRange(val, from, to) {
-	if (from > to) {
-		var tmp = from;
-		from = to;
-		to = tmp;
-	}
-	return val >= from && val <= to;
+function dest(line) {
+	return { x: line[2], y: line[3] };
 }

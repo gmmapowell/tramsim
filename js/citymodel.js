@@ -58,12 +58,16 @@ class Graph {
 		var self = this;
 		for (var i=0;i<this.edges.length;i++) {
 			(function(j) {
-				setTimeout(() => render.edge(self.edges[j]), offset++*500);
+				// setTimeout(() => 
+					render.edge(self.edges[j])
+				// , offset++*500);
 			})(i);
 		}
 		for (var i=0;i<this.nodes.length;i++) {
 			(function(j) {
-				setTimeout(() => render.node(self.nodes[j]), offset++*500);
+				// setTimeout(() => 
+				render.node(self.nodes[j])
+				// , offset++*500);
 			})(i);
 		}
 	}
@@ -88,6 +92,16 @@ class Graph {
 				return;
 		}
 		this.edges.push(new Edge(from, to, kind));
+	}
+
+	edgesAt(node) {
+		var ret = [];
+		for (var i=0;i<this.edges.length;i++) {
+			var edge = this.edges[i];
+			if (edge.from == node || edge.to == node)
+				ret.push(edge);
+		}
+		return ret;
 	}
 }
 
@@ -117,17 +131,55 @@ class Edge {
 		this.kind = kind;
 	}
 
+	rightLine(arriving) {
+		if (arriving == this.from)
+			return this.lineWith(1, -1);
+		else
+			return this.lineWith(1, 1);
+	}
+
+	leftLine(arriving) {
+		if (arriving == this.from)
+			return this.lineWith(-1, -1);
+		else
+			return this.lineWith(-1, 1);
+	}
+
+	rightEndsAt(arriving, posn) {
+		if (arriving == this.from)
+			this.fromRight = posn;
+		else
+			this.toRight = posn;
+	}
+
+	leftEndsAt(arriving, posn) {
+		if (arriving == this.from)
+			this.fromLeft = posn;
+		else
+			this.toLeft = posn;
+	}
+
 	lines() {
+		return [ [ this.fromLeft.x, this.fromLeft.y, this.toRight.x, this.toRight.y ], [ this.fromRight.x, this.fromRight.y, this.toLeft.x, this.toLeft.y ]];
+	}
+
+	lineWith(lr, dir) {
 		var wid = this.kind.width;
-		var dx = this.to.x - this.from.x;
-		var dy = this.to.y - this.from.y;
-		var normalAngle = Math.atan2(dx, dy); // using dx and dy the "other way around" to find the normal
+		var dx, dy;
+		if (dir == 1) {
+			dx = this.to.x - this.from.x;
+			dy = this.to.y - this.from.y;
+		} else {
+			dx = this.from.x - this.to.x;
+			dy = this.from.y - this.to.y;
+		}
+		var normalAngle = Math.atan2(dx, dy); // using dx and dy the "other way around" to find the normal pointing "right"
 		var xdisp = wid*Math.cos(normalAngle) / 2;
 		var ydisp = wid*Math.sin(normalAngle) / 2;
-		return [
-			[ this.from.x - xdisp, this.from.y + ydisp, this.to.x - xdisp, this.to.y + ydisp ],
-			[ this.from.x + xdisp, this.from.y - ydisp, this.to.x + xdisp, this.to.y - ydisp ]
-		];
+		if (dir == 1)
+			return [ this.from.x + lr*xdisp, this.from.y - lr*ydisp, this.to.x + lr*xdisp, this.to.y - lr*ydisp ];
+		else 
+			return [ this.to.x + lr*xdisp, this.to.y - lr*ydisp, this.from.x + lr*xdisp, this.from.y - lr*ydisp ];
 	}
 
 	toString() {
