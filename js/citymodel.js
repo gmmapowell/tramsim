@@ -113,10 +113,23 @@ class Node {
 		this.x = x;
 		this.y = y;
 		this.kind = null;
+		this.caps = [];
 	}
 
 	specificKind(what) {
 		this.kind = what;
+	}
+
+	renderWith(r) {
+		if (this.kind && this.kind.renderWith) {
+			this.kind.renderWith(r);
+		} else {
+			r.renderLines(this.caps);
+		}
+	}
+
+	cap(l, r) {
+		this.caps.push([l.x, l.y, r.x, r.y]);
 	}
 
 	toString() {

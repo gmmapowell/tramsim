@@ -28,9 +28,7 @@ class Render {
 	}
 
 	node(node) {
-		if (node.kind) {
-			this.renderLines(node.kind.lines());
-		}
+		node.renderWith(this);
 	}
 
 	edge(edge) {

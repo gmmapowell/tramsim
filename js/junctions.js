@@ -98,9 +98,11 @@ class JunctionFinder {
 		var edges = this.city.edgesAt(n);
 		if (edges.length == 1) {
 			var e = edges[0];
-			e.leftEndsAt(n, dest(e.leftLine(n)));
-			e.rightEndsAt(n, dest(e.rightLine(n)));
-			// TODO: cap it
+			var l = dest(e.leftLine(n));
+			e.leftEndsAt(n, l);
+			var r = dest(e.rightLine(n));
+			e.rightEndsAt(n, r);
+			n.cap(l, r);
 			return;
 		}
 		var as = [];
@@ -133,6 +135,7 @@ class JunctionFinder {
 				// they don't meet; reflect their ends back to them
 				ase.e.rightEndsAt(n, dest(fst));
 				nxe.e.leftEndsAt(n, dest(snd));
+				n.cap(dest(fst), dest(snd));
 			} else {
 				ase.e.rightEndsAt(n, posn);
 				nxe.e.leftEndsAt(n, posn);
