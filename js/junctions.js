@@ -64,12 +64,12 @@ class JunctionFinder {
 				// console.log(edge1.toString(), edge2.toString(), "meet at", meetx, meety);
 				var midpoint = this.city.intersection(new Node(meetx, meety));
 				if ((edge1.from.x != midpoint.x || edge1.from.y != midpoint.y) && (edge1.to.x != midpoint.x || edge1.to.y != midpoint.y)) {
-					console.log("need to split " + edge1 + " at " + midpoint);
+					// console.log("need to split " + edge1 + " at " + midpoint);
 					this.city.road(midpoint, edge1.to, edge1.kind);
 					edge1.to = midpoint; // adjust existing one in place
 				}
 				if ((edge2.from.x != midpoint.x || edge2.from.y != midpoint.y) && (edge2.to.x != midpoint.x || edge2.to.y != midpoint.y)) {
-					console.log("need to split " + edge2 + " at " + midpoint);
+					// console.log("need to split " + edge2 + " at " + midpoint);
 					this.city.road(midpoint, edge2.to, edge2.kind);
 					edge2.to = midpoint; // adjust existing one in place
 				}
@@ -96,7 +96,6 @@ class JunctionFinder {
 
 	layOutNode(n) {
 		var edges = this.city.edgesAt(n);
-		console.log(n + " has " + edges.length);
 		if (edges.length == 1) {
 			var e = edges[0];
 			e.leftEndsAt(n, dest(e.leftLine(n)));

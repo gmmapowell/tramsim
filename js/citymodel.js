@@ -173,13 +173,16 @@ class Edge {
 			dx = this.from.x - this.to.x;
 			dy = this.from.y - this.to.y;
 		}
+		var straightAngle = Math.atan2(dy, dx); // pointing the way the edge is going towards this node
+		var xcont = wid*Math.cos(straightAngle);
+		var ycont = wid*Math.sin(straightAngle);
 		var normalAngle = Math.atan2(dx, dy); // using dx and dy the "other way around" to find the normal pointing "right"
 		var xdisp = wid*Math.cos(normalAngle) / 2;
 		var ydisp = wid*Math.sin(normalAngle) / 2;
 		if (dir == 1)
-			return [ this.from.x + lr*xdisp, this.from.y - lr*ydisp, this.to.x + lr*xdisp, this.to.y - lr*ydisp ];
+			return [ this.from.x + lr*xdisp, this.from.y - lr*ydisp, this.to.x + lr*xdisp + xcont, this.to.y - lr*ydisp + ycont ];
 		else 
-			return [ this.to.x + lr*xdisp, this.to.y - lr*ydisp, this.from.x + lr*xdisp, this.from.y - lr*ydisp ];
+			return [ this.to.x + lr*xdisp, this.to.y - lr*ydisp, this.from.x + lr*xdisp + xcont, this.from.y - lr*ydisp + ycont ];
 	}
 
 	toString() {
