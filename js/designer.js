@@ -20,4 +20,6 @@ function designCity() {
 
 	// Our first WE tram line
 	city.straight(510, 995, 1990, 995);
+	// SW to NE tram line
+	city.straight(500, 100, 2000, 1900);
 }

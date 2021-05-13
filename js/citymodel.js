@@ -287,14 +287,15 @@ class Circus {
 
 class TrackStraight {
 	constructor(fx, fy, tx, ty) {
-		this.fx = fx;
-		this.fy = fy;
-		this.tx = tx;
-		this.ty = ty;
+		var tw = 1;
+		var ang = Math.atan2(ty - fy, tx - fx);
+		var dx = tw * Math.sin(ang);
+		var dy = tw * Math.cos(ang);
+		this.pts = [ fx+dx, fy-dy,  tx+dx, ty-dy,  tx-dx, ty+dy,  fx-dx, fy+dy ];
 	}
 
 	render(render) {
-		// TODO: need to figure the proper geometry of the track
-		render.fillPoly([ this.fx, this.fy-1,  this.tx, this.fy-1,  this.tx, this.ty+1,  this.fx, this.ty+1 ]);
+		render.gc.fillStyle = 'darkgray';
+		render.fillPoly(this.pts);
 	}
 }

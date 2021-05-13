@@ -71,7 +71,7 @@ class Render {
 			var pt = this.mapCoord(points[i], points[i+1]);
 			this.gc.lineTo(pt.x, pt.y);
 		}
-		this.gc.fillStyle = 'darkgray';
 		this.gc.fill();
+		// this.gc.stroke();
 	}
 }
