@@ -14,5 +14,8 @@ function designCity() {
 	// road from due S to E central
 	city.road(new Node(1250, 100), new Node(1800, 1000), new Road());
 	// large circus in the middle of town
-	city.circus(new Node(1250, 1000), 30);
+	city.circus(new Node(1250, 1000), 80);
+
+	// TODO:
+	// circus should break up roads
 }

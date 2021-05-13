@@ -122,7 +122,7 @@ class Node {
 
 	renderWith(r) {
 		if (this.kind && this.kind.renderWith) {
-			this.kind.renderWith(r);
+			this.kind.renderWith(this, r);
 		} else {
 			r.renderLines(this.caps);
 		}
@@ -178,13 +178,15 @@ class Edge {
 
 	lineWith(lr, dir) {
 		var wid = this.kind.width;
-		var dx, dy;
+		var dx, dy, to;
 		if (dir == 1) {
-			dx = this.to.x - this.from.x;
-			dy = this.to.y - this.from.y;
+			to = this.to;
+			dx = to.x - this.from.x;
+			dy = to.y - this.from.y;
 		} else {
-			dx = this.from.x - this.to.x;
-			dy = this.from.y - this.to.y;
+			var to = this.from;
+			dx = to.x - this.to.x;
+			dy = to.y - this.to.y;
 		}
 		var straightAngle = Math.atan2(dy, dx); // pointing the way the edge is going towards this node
 		var xcont = wid*Math.cos(straightAngle);
@@ -192,10 +194,15 @@ class Edge {
 		var normalAngle = Math.atan2(dx, dy); // using dx and dy the "other way around" to find the normal pointing "right"
 		var xdisp = wid*Math.cos(normalAngle) / 2;
 		var ydisp = wid*Math.sin(normalAngle) / 2;
+		var ret;
 		if (dir == 1)
-			return [ this.from.x + lr*xdisp, this.from.y - lr*ydisp, this.to.x + lr*xdisp + xcont, this.to.y - lr*ydisp + ycont ];
+			ret = [ this.from.x + lr*xdisp, this.from.y - lr*ydisp, this.to.x + lr*xdisp + xcont, this.to.y - lr*ydisp + ycont ];
 		else 
-			return [ this.to.x + lr*xdisp, this.to.y - lr*ydisp, this.from.x + lr*xdisp + xcont, this.from.y - lr*ydisp + ycont ];
+			ret = [ this.to.x + lr*xdisp, this.to.y - lr*ydisp, this.from.x + lr*xdisp + xcont, this.from.y - lr*ydisp + ycont ];
+		if (to.kind && to.kind.blockAt)
+			return to.kind.blockAt(to, ret);
+		else
+			return ret;
 	}
 
 	toString() {
@@ -231,10 +238,6 @@ class Road {
 }
 
 class Intersection {
-	lines() {
-		return [];
-	}
-
 	toString() {
 		return "Intersection";
 	}
@@ -245,8 +248,23 @@ class Circus {
 		this.radius = radius;
 	}
 
-	lines() {
-		return [];
+	blockAt(to, line) {
+		var dx = line[2] - to.x;
+		var dy = line[3] - to.y;
+		if (dx*dx + dy*dy < this.radius * this.radius) {
+			return truncateAt(line, to, this.radius);
+		} else {
+			return line;
+		}
+	}
+
+	renderWith(n, r) {
+		if (n.caps.length > 0) {
+			for (var i=0;i<n.caps.length;i++) {
+				var ci = n.caps[i];
+				r.arc(n, this.radius, {x:ci[0], y:ci[1]}, {x:ci[2], y: ci[3]});
+			}
+		}
 	}
 
 	toString() {

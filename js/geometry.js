@@ -66,6 +66,28 @@ function linesIntersect(line1, line2) {
 	return { x: meetx, y : meety };
 }
 
+// truncate a line when it comes within a circle of size rad of node
+function truncateAt(line, node, rad) {
+	var fx1 = line[0];
+	var fy1 = line[1];
+	var tx1 = line[2];
+	var ty1 = line[3];
+	var angle = Math.atan2(ty1-fy1, tx1-fx1);
+	var normal = angle + Math.PI/2;
+	console.log("angle", angle, "normal", normal);
+	var normalLine = [ node.x - rad * Math.cos(normal), node.y - rad * Math.sin(normal), node.x + rad * Math.cos(normal), node.y + rad * Math.sin(normal) ];
+	var closest = linesIntersect(line, normalLine);
+	console.log("closest = ", closest);
+	var adj2 = (closest.x - node.x)*(closest.x - node.x) + (closest.y - node.y)*(closest.y - node.y);
+	var opp2 = rad * rad - adj2;
+	var opp = Math.sqrt(opp2);
+	console.log("opp =", opp);
+	var newEndX = closest.x - opp*Math.cos(angle);
+	var newEndY = closest.y - opp*Math.sin(angle);
+	return [ fx1, fy1, newEndX, newEndY ];
+
+}
+
 function inRange(val, from, to) {
 	if (from > to) {
 		var tmp = from;

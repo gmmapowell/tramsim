@@ -54,12 +54,12 @@ class Render {
 		}
 	}
 
-	// circle(x, y, r) {
-	// 	this.gc.beginPath();
-	// 	var center = this.mapCoord(x, y);
-	// 	this.gc.arc(center.x, center.y, r*scale, 0, 2*Math.PI);
-	// 	this.gc.fillStyle = 'white';
-	// 	this.gc.fill();
-	// 	this.gc.stroke();
-	// }
+	arc(center, rad, from, to) {
+		var af = Math.atan2(from.y - center.y, from.x - center.x);
+		var at = Math.atan2(to.y - center.y, to.x - center.x);
+		center = this.mapCoord(center.x, center.y);
+		this.gc.beginPath();
+		this.gc.arc(center.x, center.y, rad*scale, af, at);
+		this.gc.stroke();
+	}
 }
