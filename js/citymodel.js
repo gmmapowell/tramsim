@@ -364,8 +364,25 @@ class TrackCurve {
 		var prevAng = Math.atan2(this.prev.ty - center.y, this.prev.tx - center.x);
 		var nextAng = Math.atan2(this.next.fy - center.y, this.next.fx - center.x);
 
-		var orad = Math.sqrt( Math.pow(this.prev.pts[4]-center.x, 2) + Math.pow(this.prev.pts[5]-center.y, 2) );
-		var irad = Math.sqrt( Math.pow(this.prev.pts[2]-center.x, 2) + Math.pow(this.prev.pts[3]-center.y, 2) );
+		var orad1 = Math.sqrt( Math.pow(this.prev.pts[4]-center.x, 2) + Math.pow(this.prev.pts[5]-center.y, 2) );
+		var irad1 = Math.sqrt( Math.pow(this.prev.pts[2]-center.x, 2) + Math.pow(this.prev.pts[3]-center.y, 2) );
+
+		var orad2 = Math.sqrt( Math.pow(this.next.pts[6]-center.x, 2) + Math.pow(this.next.pts[7]-center.y, 2) );
+		var irad2 = Math.sqrt( Math.pow(this.next.pts[0]-center.x, 2) + Math.pow(this.next.pts[1]-center.y, 2) );
+
+		var orad = Math.min(orad1, orad2);
+		var irad = Math.min(irad1, irad2);
+
+		if (irad1 < irad2) {
+			var len = irad2 - irad1;
+			var addX = len * Math.cos(prevSlope);
+			var addY = len * Math.sin(prevSlope);
+			center.x += addX;
+			center.y += addY;
+		} else if (irad1 < irad2) {
+			// something very similar to the above, but compensating in the other direction
+			debugger;
+		}
 
 		var pts = [ this.prev.pts[4], this.prev.pts[5], this.next.pts[6], this.next.pts[7], this.next.pts[0], this.next.pts[1], this.prev.pts[2], this.prev.pts[3] ];
 		this.arcs.push({ center, from: prevAng, to: nextAng, irad, orad, clockwise: true, pts });

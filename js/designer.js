@@ -23,9 +23,8 @@ function designCity() {
 	// builder.straight(1990, 995);
 	builder.straight(1170, 995);
 	// TODO: we need a point here ...
-	builder.curve(1245, 920);
-	// builder.straight(1255, 105); // this is the correct thing
-	builder.straight(1245, 105); // hack to make constant radius
+	builder.curve(1255, 920);
+	builder.straight(1255, 105);
 
 	// SW to NE tram line
 	var builder = city.tramFrom(500, 100);
