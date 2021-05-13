@@ -59,7 +59,7 @@ class Render {
 		var at = Math.atan2(to.y - center.y, to.x - center.x);
 		center = this.mapCoord(center.x, center.y);
 		this.gc.beginPath();
-		this.gc.arc(center.x, center.y, rad*scale, af, at);
+		this.gc.arc(center.x, center.y, rad*scale, -af, -at, true);
 		this.gc.stroke();
 	}
 }

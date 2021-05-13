@@ -10,6 +10,22 @@ class JunctionFinder {
 	// find all the places in the city where the roads intersect and break them there
 	// I think this should also find all the places where explicit nodes break roads but it does not currently
 	resolve() {
+		// do any roads hit any pre-defined intersections?
+		for (var ei=0;ei<this.city.edges.length;ei++) {
+			var edge = this.city.edges[ei];
+			for (var ni=0;ni<this.city.nodes.length;ni++) {
+				var n = this.city.nodes[ni];
+				if (n.kind != null) {
+					if (lineCloseTo(edge, n, n.kind.radius)) {
+						if ((edge.from.x != n.x || edge.from.y != n.y) && (edge.to.x != n.x || edge.to.y != n.y)) {
+							// console.log("need to split " + edge1 + " at " + midpoint);
+							this.city.road(n, edge.to, edge.kind);
+							edge.to = n; // adjust existing one in place
+						}
+					}
+				}
+			}
+		}
 		// take each pair of edges and see if they cross and where
 		for (var ei=0;ei<this.city.edges.length;ei++) {
 			var edge1 = this.city.edges[ei];
@@ -113,12 +129,12 @@ class JunctionFinder {
 				ang = Math.atan2(e.from.y-e.to.y, e.from.x-e.to.x);
 			else
 				ang = Math.atan2(e.to.y-e.from.y, e.to.x-e.from.x);
-			console.log("have " + e + " at " + ang);
+			// console.log("have " + e + " at " + ang);
 			as.push({ ang, e });
 		}
 
 		as.sort((x,y) => { return x.ang < y.ang ? -1 : 1; });
-		console.log("sorted as", as);
+		// console.log("sorted as", as);
 
 		for (var i=0;i<as.length;i++) {
 			var ase = as[i];
@@ -130,7 +146,7 @@ class JunctionFinder {
 			var fst = ase.e.rightLine(n);
 			var snd = nxe.e.leftLine(n);
 			var posn = linesIntersect(fst, snd);
-			console.log(fst + " and " + snd + " meet at " + JSON.stringify(posn));
+			// console.log(fst + " and " + snd + " meet at " + JSON.stringify(posn));
 			if (!posn) {
 				// they don't meet; reflect their ends back to them
 				ase.e.rightEndsAt(n, dest(fst));

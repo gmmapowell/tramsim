@@ -264,6 +264,9 @@ class Circus {
 				var ci = n.caps[i];
 				r.arc(n, this.radius, {x:ci[0], y:ci[1]}, {x:ci[2], y: ci[3]});
 			}
+		} else {
+			r.arc(n, this.radius, {x:n.x - this.radius, y: n.y}, {x: n.x + this.radius, y: n.y});
+			r.arc(n, this.radius, {x:n.x + this.radius, y: n.y}, {x: n.x - this.radius, y: n.y});
 		}
 	}
 

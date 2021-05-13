@@ -74,18 +74,41 @@ function truncateAt(line, node, rad) {
 	var ty1 = line[3];
 	var angle = Math.atan2(ty1-fy1, tx1-fx1);
 	var normal = angle + Math.PI/2;
-	console.log("angle", angle, "normal", normal);
 	var normalLine = [ node.x - rad * Math.cos(normal), node.y - rad * Math.sin(normal), node.x + rad * Math.cos(normal), node.y + rad * Math.sin(normal) ];
 	var closest = linesIntersect(line, normalLine);
-	console.log("closest = ", closest);
 	var adj2 = (closest.x - node.x)*(closest.x - node.x) + (closest.y - node.y)*(closest.y - node.y);
 	var opp2 = rad * rad - adj2;
 	var opp = Math.sqrt(opp2);
-	console.log("opp =", opp);
+	// console.log("opp =", opp);
 	var newEndX = closest.x - opp*Math.cos(angle);
 	var newEndY = closest.y - opp*Math.sin(angle);
 	return [ fx1, fy1, newEndX, newEndY ];
+}
 
+function lineCloseTo(line, point, noMoreThan) {
+	var fx, fy, tx, ty;
+	
+	if (line instanceof Edge) {
+		fx = line.from.x;
+		fy = line.from.y;
+		tx = line.to.x;
+		ty = line.to.y;
+	} else {
+		fx = line[0];
+		fy = line[1];
+		tx = line[2];
+		ty = line[3];
+	}
+
+	var angle = Math.atan2(ty-fy, tx-fx);
+	var normal = angle + Math.PI/2;
+	var normalLine = [ point.x - noMoreThan * Math.cos(normal), point.y - noMoreThan * Math.sin(normal), point.x + noMoreThan * Math.cos(normal), point.y + noMoreThan * Math.sin(normal) ];
+	var closest = linesIntersect(line, normalLine);
+	if (!closest || !inRange(closest.x, fx, tx) || !inRange(closest.y, fy, ty))
+		return false; // I think there is a case in here where it doesn't "quite" reach, but we should consider it anyway
+	
+	var dist = (closest.x-point.x)*(closest.x-point.x) + (closest.y-point.y)*(closest.y-point.y);
+	return (dist <= noMoreThan*noMoreThan);
 }
 
 function inRange(val, from, to) {
