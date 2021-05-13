@@ -72,6 +72,21 @@ class Render {
 			this.gc.lineTo(pt.x, pt.y);
 		}
 		this.gc.fill();
-		// this.gc.stroke();
+	}
+
+	fillArc(arc) {
+		this.gc.beginPath();
+		var center = this.mapCoord(arc.center.x, arc.center.y);
+		var pt = this.mapCoord(arc.pts[6], arc.pts[7]);
+		this.gc.moveTo(pt.x, pt.y);
+		pt = this.mapCoord(arc.pts[0], arc.pts[1]);
+		this.gc.lineTo(pt.x, pt.y);
+		pt = this.mapCoord(arc.pts[2], arc.pts[3]);
+		this.gc.arc(center.x, center.y, arc.orad*scale, -arc.from, -arc.to, !arc.clockwise);
+		pt = this.mapCoord(arc.pts[4], arc.pts[5]);
+		this.gc.lineTo(pt.x, pt.y);
+		pt = this.mapCoord(arc.pts[6], arc.pts[7]);
+		this.gc.arc(center.x, center.y, arc.irad*scale, -arc.to, -arc.from, arc.clockwise);
+		this.gc.fill();
 	}
 }

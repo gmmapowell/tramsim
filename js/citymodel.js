@@ -285,26 +285,97 @@ class TramBuilder {
 		this.parts = parts;
 		this.x = fx;
 		this.y = fy;
+		this.prev = null;
 	}
 
 	straight(tx, ty) {
-		this.parts.push(new TrackStraight(this.x, this.y, tx, ty));
+		this.prev = new TrackStraight(this.prev, this.x, this.y, tx, ty);
+		this.parts.push(this.prev);
+		this.x = tx;
+		this.y = ty;
+	}
+
+	curve(tx, ty) {
+		this.prev = new TrackCurve(this.prev, this.x, this.y, tx, ty);
+		this.parts.push(this.prev);
 		this.x = tx;
 		this.y = ty;
 	}
 }
 
 class TrackStraight {
-	constructor(fx, fy, tx, ty) {
+	constructor(prev, fx, fy, tx, ty) {
+		this.prev = prev;
+		this.fx = fx;
+		this.fy = fy;
+		this.tx = tx;
+		this.ty = ty;
+		this.ang = Math.atan2(ty - fy, tx - fx);
 		var tw = 1;
-		var ang = Math.atan2(ty - fy, tx - fx);
-		var dx = tw * Math.sin(ang);
-		var dy = tw * Math.cos(ang);
+		var dx = tw * Math.sin(this.ang);
+		var dy = tw * Math.cos(this.ang);
 		this.pts = [ fx+dx, fy-dy,  tx+dx, ty-dy,  tx-dx, ty+dy,  fx-dx, fy+dy ];
+		if (prev && prev.adviseNext)
+			prev.adviseNext(this);
+	}
+
+	startSlope() {
+		return this.ang;
+	}
+
+	endSlope() {
+		return this.ang;
 	}
 
 	render(render) {
 		render.gc.fillStyle = 'darkgray';
 		render.fillPoly(this.pts);
+	}
+}
+
+class TrackCurve {
+	constructor(prev, fx, fy, tx, ty) {
+		this.prev = prev;
+		this.tx = tx;
+		this.ty = ty;
+	}
+
+	adviseNext(next) {
+		this.next = next;
+	}
+
+	figureArcs() {
+		if (!this.prev || !this.next) {
+			throw new Error("figureArcs needs prev and next");
+		}
+		this.arcs = [];
+		var prevSlope = this.prev.endSlope();
+		var nextSlope = this.next.startSlope();
+		var prevNormal = prevSlope + Math.PI/2;
+		var nextNormal = nextSlope + Math.PI/2;
+		var len = 200;
+		var prevNL = [ this.prev.tx, this.prev.ty, this.prev.tx + len * Math.cos(prevNormal), this.prev.ty + len * Math.sin(prevNormal) ];
+		var nextNL = [ this.next.fx, this.next.fy, this.next.fx + len * Math.cos(nextNormal), this.next.fy + len * Math.sin(nextNormal) ];
+
+		// the normals must cross at the center of the circle
+		var center = linesIntersect(prevNL, nextNL, true);
+
+		// now we are able to deduce the subtended angles for each of these ...
+		var prevAng = Math.atan2(this.prev.ty - center.y, this.prev.tx - center.x);
+		var nextAng = Math.atan2(this.next.fy - center.y, this.next.fx - center.x);
+
+		var orad = Math.sqrt( Math.pow(this.prev.pts[4]-center.x, 2) + Math.pow(this.prev.pts[5]-center.y, 2) );
+		var irad = Math.sqrt( Math.pow(this.prev.pts[2]-center.x, 2) + Math.pow(this.prev.pts[3]-center.y, 2) );
+
+		var pts = [ this.prev.pts[4], this.prev.pts[5], this.next.pts[6], this.next.pts[7], this.next.pts[0], this.next.pts[1], this.prev.pts[2], this.prev.pts[3] ];
+		this.arcs.push({ center, from: prevAng, to: nextAng, irad, orad, clockwise: true, pts });
+	}
+
+	render(render) {
+		if (!this.arcs)
+			this.figureArcs();
+		render.gc.fillStyle = 'darkgray';
+		for (var i=0;i<this.arcs.length;i++)
+			render.fillArc(this.arcs[i]);
 	}
 }

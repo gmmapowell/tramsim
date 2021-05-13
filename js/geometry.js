@@ -1,7 +1,7 @@
 // we need a consistent definition of a line
 // it can be an edge or it can be an array of 4 values
 
-function linesIntersect(line1, line2) {
+function linesIntersect(line1, line2, allowExtension) {
 	var fx1, fy1, tx1, ty1;
 	var fx2, fy2, tx2, ty2;
 	
@@ -56,12 +56,15 @@ function linesIntersect(line1, line2) {
 		meetx = (c2 - c1) / (slope1 - slope2);
 		meety = slope1*meetx + c1;
 	}
-	// meetx = Math.round(meetx);
-	// meety = Math.round(meety);
-	if (!inRange(meetx, fx1, tx1) || !inRange(meetx, fx2, tx2))
-		return null;
-	if (!inRange(meety, fy1, ty1) || !inRange(meety, fy2, ty2))
-		return null;
+
+	if (!allowExtension) {
+		// meetx = Math.round(meetx);
+		// meety = Math.round(meety);
+		if (!inRange(meetx, fx1, tx1) || !inRange(meetx, fx2, tx2))
+			return null;
+		if (!inRange(meety, fy1, ty1) || !inRange(meety, fy2, ty2))
+			return null;
+	}
 
 	return { x: meetx, y : meety };
 }

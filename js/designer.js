@@ -20,7 +20,13 @@ function designCity() {
 
 	// Our first WE tram line
 	var builder = city.tramFrom(510, 995);
-	builder.straight(1990, 995);
+	// builder.straight(1990, 995);
+	builder.straight(1170, 995);
+	// TODO: we need a point here ...
+	builder.curve(1245, 920);
+	// builder.straight(1255, 105); // this is the correct thing
+	builder.straight(1245, 105); // hack to make constant radius
+
 	// SW to NE tram line
 	var builder = city.tramFrom(500, 100);
 	builder.straight(2000, 1900);
