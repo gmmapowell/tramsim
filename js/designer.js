@@ -19,7 +19,9 @@ function designCity() {
 	city.circus(new Node(1625, 1450), 50);
 
 	// Our first WE tram line
-	city.straight(510, 995, 1990, 995);
+	var builder = city.tramFrom(510, 995);
+	builder.straight(1990, 995);
 	// SW to NE tram line
-	city.straight(500, 100, 2000, 1900);
+	var builder = city.tramFrom(500, 100);
+	builder.straight(2000, 1900);
 }

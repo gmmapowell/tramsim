@@ -43,11 +43,6 @@ class Graph {
 		return center;
 	}
 
-	simplify() {
-		// find all the places where edges cross
-		// adjust them to introduce more nodes and edges
-	}
-
 	renderInto(canvas, centerX, centerY, scale) {
 		// render the city into the canvas making the point (centerX, centerY) in CITY coordinates be in the center of the canvas
 		// the scale factor is in canvas pixels per city coordinate dimensional units
@@ -110,8 +105,8 @@ class Graph {
 
 	// When constructing the track, we require the user to be VERY much more precise about where it is going
 	// - to the nearest millimetre.  This is the middle of the track, obvs.
-	straight(fx, fy, tx, ty) {
-		this.track.push(new TrackStraight(fx, fy, tx, ty));
+	tramFrom(fx, fy) {
+		return new TramBuilder(this.track, fx, fy);
 	}
 }
 
@@ -282,6 +277,20 @@ class Circus {
 
 	toString() {
 		return "Circus";
+	}
+}
+
+class TramBuilder {
+	constructor(parts, fx, fy) {
+		this.parts = parts;
+		this.x = fx;
+		this.y = fy;
+	}
+
+	straight(tx, ty) {
+		this.parts.push(new TrackStraight(this.x, this.y, tx, ty));
+		this.x = tx;
+		this.y = ty;
 	}
 }
 
