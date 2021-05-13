@@ -16,6 +16,7 @@ class Graph {
 		this.ht = ht;
 		this.nodes = [];
 		this.edges = [];
+		this.track = [];
 	}
 
 	road(from, to, kind) {
@@ -54,7 +55,7 @@ class Graph {
 		// and the whole canvas would be filled with city X values from 700 to 1300 and Y from 700 to 1100.
 
 		var render = new Render(canvas.getContext("2d"), canvas.width, canvas.height, centerX, centerY, scale);
-		var offset = 0;
+		// var offset = 0;
 		var self = this;
 		for (var i=0;i<this.edges.length;i++) {
 			(function(j) {
@@ -69,6 +70,9 @@ class Graph {
 				render.node(self.nodes[j])
 				// , offset++*500);
 			})(i);
+		}
+		for (var i=0;i<this.track.length;i++) {
+			this.track[i].render(render);
 		}
 	}
 
@@ -102,6 +106,12 @@ class Graph {
 				ret.push(edge);
 		}
 		return ret;
+	}
+
+	// When constructing the track, we require the user to be VERY much more precise about where it is going
+	// - to the nearest millimetre.  This is the middle of the track, obvs.
+	straight(fx, fy, tx, ty) {
+		this.track.push(new TrackStraight(fx, fy, tx, ty));
 	}
 }
 
@@ -272,5 +282,19 @@ class Circus {
 
 	toString() {
 		return "Circus";
+	}
+}
+
+class TrackStraight {
+	constructor(fx, fy, tx, ty) {
+		this.fx = fx;
+		this.fy = fy;
+		this.tx = tx;
+		this.ty = ty;
+	}
+
+	render(render) {
+		// TODO: need to figure the proper geometry of the track
+		render.fillPoly([ this.fx, this.fy-1,  this.tx, this.fy-1,  this.tx, this.ty+1,  this.fx, this.ty+1 ]);
 	}
 }

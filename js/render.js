@@ -62,4 +62,16 @@ class Render {
 		this.gc.arc(center.x, center.y, rad*scale, -af, -at, true);
 		this.gc.stroke();
 	}
+
+	fillPoly(points) {
+		this.gc.beginPath();
+		var pt = this.mapCoord(points[points.length-2], points[points.length-1]);
+		this.gc.moveTo(pt.x, pt.y);
+		for (var i=0;i<points.length;i+=2) {
+			var pt = this.mapCoord(points[i], points[i+1]);
+			this.gc.lineTo(pt.x, pt.y);
+		}
+		this.gc.fillStyle = 'darkgray';
+		this.gc.fill();
+	}
 }

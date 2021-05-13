@@ -1,4 +1,5 @@
 var drawAs = document.getElementById('layout');
+var animateIn = document.getElementById('animation');
 var panX, panY, scale;
 var junctions;
 
@@ -12,6 +13,8 @@ function begin() {
 	panY = city.ht/2;
 	scale = 0.25;
 	renderNow();
+
+	animateMe();
 }
 
 function renderNow() {

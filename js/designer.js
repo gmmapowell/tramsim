@@ -17,4 +17,7 @@ function designCity() {
 	city.circus(new Node(1250, 1000), 80);
 	// lesser circus to the NE
 	city.circus(new Node(1625, 1450), 50);
+
+	// Our first WE tram line
+	city.straight(510, 995, 1990, 995);
 }
