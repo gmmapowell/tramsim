@@ -351,43 +351,73 @@ class TrackCurve {
 		this.arcs = [];
 		var prevSlope = this.prev.endSlope();
 		var nextSlope = this.next.startSlope();
+
+		var len = 200;
+		var prevL = [this.prev.tx, this.prev.ty, this.prev.tx + len * Math.cos(prevSlope), this.prev.ty + len * Math.sin(prevSlope) ];
+		var nextL = [this.next.fx, this.next.fy, this.next.fx - len * Math.cos(nextSlope), this.next.fy - len * Math.sin(nextSlope) ];
+		var crossAt = linesIntersect(prevL, nextL, true);
+
+		var fpLen = lineLength([ this.prev.tx, this.prev.ty, crossAt.x, crossAt.y ]);
+		var tnLen = lineLength([ crossAt.x, crossAt.y, this.next.fx, this.next.fy]);
+
+		var px, py, nx, ny;
+		if (fpLen < tnLen) {
+			px = this.prev.tx;
+			py = this.prev.ty;
+			var txy = moveAlong(crossAt, nextSlope, fpLen); 
+			nx = txy.x;
+			ny = txy.y;
+		} else if (tnLen < fpLen) {
+			var fxy = moveAlong(crossAt, prevSlope, -tnLen); 
+			px = fxy.x;
+			py = fxy.y;
+			nx = this.next.fx;
+			ny = this.next.fy;
+		} else {
+			// they are, amazingly, the same
+		}
+
 		var prevNormal = prevSlope + Math.PI/2;
 		var nextNormal = nextSlope + Math.PI/2;
-		var len = 200;
-		var prevNL = [ this.prev.tx, this.prev.ty, this.prev.tx + len * Math.cos(prevNormal), this.prev.ty + len * Math.sin(prevNormal) ];
-		var nextNL = [ this.next.fx, this.next.fy, this.next.fx + len * Math.cos(nextNormal), this.next.fy + len * Math.sin(nextNormal) ];
-
+		var prevNL = [ px, py, px + len * Math.cos(prevNormal), py + len * Math.sin(prevNormal) ];
+		var nextNL = [ nx, ny, nx - len * Math.cos(nextNormal), ny - len * Math.sin(nextNormal) ];
+		
 		// the normals must cross at the center of the circle
 		var center = linesIntersect(prevNL, nextNL, true);
+		var rad = lineLength([ px, py, center.x, center.y ]); // could also use nx, ny
 
 		// now we are able to deduce the subtended angles for each of these ...
-		var prevAng = Math.atan2(this.prev.ty - center.y, this.prev.tx - center.x);
-		var nextAng = Math.atan2(this.next.fy - center.y, this.next.fx - center.x);
-
-		var orad1 = Math.sqrt( Math.pow(this.prev.pts[4]-center.x, 2) + Math.pow(this.prev.pts[5]-center.y, 2) );
-		var irad1 = Math.sqrt( Math.pow(this.prev.pts[2]-center.x, 2) + Math.pow(this.prev.pts[3]-center.y, 2) );
-
-		var orad2 = Math.sqrt( Math.pow(this.next.pts[6]-center.x, 2) + Math.pow(this.next.pts[7]-center.y, 2) );
-		var irad2 = Math.sqrt( Math.pow(this.next.pts[0]-center.x, 2) + Math.pow(this.next.pts[1]-center.y, 2) );
-
-		var orad = Math.min(orad1, orad2);
-		var irad = Math.min(irad1, irad2);
-
-		if (irad1 < irad2) {
-			var len = irad2 - irad1;
-			var addX = len * Math.cos(prevSlope);
-			var addY = len * Math.sin(prevSlope);
-			center.x += addX;
-			center.y += addY;
-		} else if (irad1 < irad2) {
-			// something very similar to the above, but compensating in the other direction
-			debugger;
-		}
+		var prevAng = Math.atan2(py - center.y, px - center.x);
+		var nextAng = Math.atan2(ny - center.y, nx - center.x);
 
 		var clockwise = Math.sin(nextAng-prevAng) < 0;
 
-		var pts = [ this.prev.pts[4], this.prev.pts[5], this.next.pts[6], this.next.pts[7], this.next.pts[0], this.next.pts[1], this.prev.pts[2], this.prev.pts[3] ];
-		this.arcs.push({ center, from: prevAng, to: nextAng, irad, orad, clockwise, pts });
+		var fromOuter = { x: this.prev.pts[2], y: this.prev.pts[3] };
+		var fromInner = { x: this.prev.pts[4], y: this.prev.pts[5] };
+		var toInner = { x: this.next.pts[6], y: this.next.pts[7] };
+		var toOuter = { x: this.next.pts[0], y: this.next.pts[1] };
+
+		if (!clockwise) {
+			var tmp = fromOuter;
+			fromOuter = fromInner;
+			fromInner = tmp;
+
+			tmp = toInner;
+			toInner = toOuter;
+			toOuter = tmp;
+		}
+
+		var pts = {
+			fromOuter,
+			fromInner,
+			fromInnerArc: { },
+			toInner,
+			toOuter,
+			toOuterArc: { }
+		};
+
+		this.arcs.push({ center, from: prevAng, to: nextAng, irad: rad-1, orad: rad+1, clockwise, pts });
+		// this.arcs.push({ construction: true, center, prevNL, nextNL, from: prevAng, to: nextAng, clockwise, prevL, nextL, crossAt, px, py, nx, ny });
 	}
 
 	render(render) {

@@ -1,6 +1,14 @@
 // we need a consistent definition of a line
 // it can be an edge or it can be an array of 4 values
 
+function lineLength(line) {
+	var fx1 = line[0];
+	var fy1 = line[1];
+	var tx1 = line[2];
+	var ty1 = line[3];
+	return Math.sqrt(Math.pow(tx1-fx1, 2) + Math.pow(ty1-fy1, 2));
+}
+
 function linesIntersect(line1, line2, allowExtension) {
 	var fx1, fy1, tx1, ty1;
 	var fx2, fy2, tx2, ty2;
@@ -112,6 +120,10 @@ function lineCloseTo(line, point, noMoreThan) {
 	
 	var dist = (closest.x-point.x)*(closest.x-point.x) + (closest.y-point.y)*(closest.y-point.y);
 	return (dist <= noMoreThan*noMoreThan);
+}
+
+function moveAlong(point, angle, amount) { // starting at point, move an "amount" along vector
+	return { x: point.x + amount*Math.cos(angle), y: point.y + amount*Math.sin(angle) };
 }
 
 function inRange(val, from, to) {

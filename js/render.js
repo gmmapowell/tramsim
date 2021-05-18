@@ -11,6 +11,10 @@ class Render {
 	}
 
 	mapCoord(cityX, cityY) {
+		if (cityX.x) {
+			cityY = cityX.y;
+			cityX = cityX.x;
+		}
 		// what we have:
 		//   size of the canvas
 		//   center of the city model
@@ -75,17 +79,54 @@ class Render {
 	}
 
 	fillArc(arc) {
-		this.gc.beginPath();
 		var center = this.mapCoord(arc.center.x, arc.center.y);
-		var pt = this.mapCoord(arc.pts[6], arc.pts[7]);
+		if (arc.construction) {
+			// this is for debugging and does not contain an actual arc
+			this.gc.beginPath();
+
+			this.gc.arc(center.x, center.y, 12*scale, 0, Math.PI*2, true);
+			this.gc.stroke();
+
+			this.gc.beginPath();
+			var p1 = this.mapCoord(arc.prevL[0], arc.prevL[1]);
+			var p2 = this.mapCoord(arc.prevL[2], arc.prevL[3]);
+			this.gc.moveTo(p1.x, p1.y);
+			this.gc.lineTo(p2.x, p2.y);
+
+			var n1 = this.mapCoord(arc.nextL[0], arc.nextL[1]);
+			var n2 = this.mapCoord(arc.nextL[2], arc.nextL[3]);
+			this.gc.moveTo(n1.x, n1.y);
+			this.gc.lineTo(n2.x, n2.y);
+
+			var c1 = this.mapCoord(arc.crossAt.x, arc.crossAt.y);
+			this.gc.moveTo(c1.x+10*scale, c1.y);
+			this.gc.arc(c1.x, c1.y, 10*scale, 0, 2*Math.PI);
+
+			var p = this.mapCoord(arc.px, arc.py);
+			var n = this.mapCoord(arc.nx, arc.ny);
+			this.gc.moveTo(p.x, p.y);
+			this.gc.lineTo(center.x, center.y);
+			this.gc.lineTo(n.x, n.y);
+
+			this.gc.stroke();
+			return;
+		}
+
+		// actual arc
+		this.gc.beginPath();
+		var pt = this.mapCoord(arc.pts.fromOuter);
 		this.gc.moveTo(pt.x, pt.y);
-		pt = this.mapCoord(arc.pts[0], arc.pts[1]);
+		pt = this.mapCoord(arc.pts.fromInner);
 		this.gc.lineTo(pt.x, pt.y);
-		pt = this.mapCoord(arc.pts[2], arc.pts[3]);
+		pt = this.mapCoord(arc.pts.fromInnerArc);
+		this.gc.lineTo(pt.x, pt.y);
 		this.gc.arc(center.x, center.y, arc.orad*scale, -arc.from, -arc.to, !arc.clockwise);
-		pt = this.mapCoord(arc.pts[4], arc.pts[5]);
+		pt = this.mapCoord(arc.pts.toInner);
 		this.gc.lineTo(pt.x, pt.y);
-		pt = this.mapCoord(arc.pts[6], arc.pts[7]);
+		pt = this.mapCoord(arc.pts.toOuter);
+		this.gc.lineTo(pt.x, pt.y);
+		pt = this.mapCoord(arc.pts.toOuterArc);
+		this.gc.lineTo(pt.x, pt.y);
 		this.gc.arc(center.x, center.y, arc.irad*scale, -arc.to, -arc.from, arc.clockwise);
 		this.gc.fill();
 	}
