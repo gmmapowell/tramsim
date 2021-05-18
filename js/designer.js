@@ -29,4 +29,10 @@ function designCity() {
 	// SW to NE tram line
 	var builder = city.tramFrom(500, 100);
 	builder.straight(2000, 1900);
+
+	// NW to E tram line
+	var builder = city.tramFrom(500, 1900);
+	builder.straight(1230, 1030);
+	builder.curve(1270, 995);
+	builder.straight(2000, 995);
 }

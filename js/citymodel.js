@@ -384,8 +384,10 @@ class TrackCurve {
 			debugger;
 		}
 
+		var clockwise = Math.sin(nextAng-prevAng) < 0;
+
 		var pts = [ this.prev.pts[4], this.prev.pts[5], this.next.pts[6], this.next.pts[7], this.next.pts[0], this.next.pts[1], this.prev.pts[2], this.prev.pts[3] ];
-		this.arcs.push({ center, from: prevAng, to: nextAng, irad, orad, clockwise: true, pts });
+		this.arcs.push({ center, from: prevAng, to: nextAng, irad, orad, clockwise, pts });
 	}
 
 	render(render) {
