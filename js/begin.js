@@ -12,6 +12,7 @@ function begin() {
 	panX = city.wid/2;
 	panY = city.ht/2;
 	scale = 0.25;
+	// scale = 4;
 	renderNow();
 
 	animateMe();

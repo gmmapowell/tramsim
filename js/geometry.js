@@ -134,3 +134,21 @@ function inRange(val, from, to) {
 	}
 	return val >= from && val <= to;
 }
+
+// it is alleged that point is on the line containing the line segment.  Where?
+// we represent the answer as a fraction of the line segment length where 0 is "from" and 1 is "to"
+function paramLine(line, point) {
+	if (Math.abs(line[2] - line[0]) < Math.abs(line[3] - line[1])) {
+		return (point.y - line[1]) / (line[3] - line[1]);
+	} else {
+		return (point.x - line[0]) / (line[2] - line[0]);
+	}
+}
+
+// find the point at param of the way along line segment line, where 0 returns from and 1 returns to
+// < 0 and > 1 are fine, too
+function paramOf(line, param) {
+	var dy = line[3] - line[1];
+	var dx = line[2] - line[0];
+	return { x: line[0] + param*dx, y: line[1] + param*dy };
+}

@@ -35,4 +35,12 @@ function designCity() {
 	builder.straight(1230, 1030);
 	builder.curve(1330, 995);
 	builder.straight(2000, 995);
+
+
+	// A hacked-in S bend
+	var builder = city.tramFrom(510, 1005);
+	builder.straight(1170, 1005);
+	builder.curve(1220, 980);
+	builder.straight(1290, 980);
+	
 }

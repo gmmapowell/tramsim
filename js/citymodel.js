@@ -357,41 +357,93 @@ class TrackCurve {
 		var nextL = [this.next.fx, this.next.fy, this.next.fx - len * Math.cos(nextSlope), this.next.fy - len * Math.sin(nextSlope) ];
 		var crossAt = linesIntersect(prevL, nextL, true);
 
-		var fpLen = lineLength([ this.prev.tx, this.prev.ty, crossAt.x, crossAt.y ]);
-		var tnLen = lineLength([ crossAt.x, crossAt.y, this.next.fx, this.next.fy]);
-
-		var px, py, nx, ny;
-		if (fpLen < tnLen) {
-			px = this.prev.tx;
-			py = this.prev.ty;
-			var txy = moveAlong(crossAt, nextSlope, fpLen); 
-			nx = txy.x;
-			ny = txy.y;
-		} else if (tnLen < fpLen) {
-			var fxy = moveAlong(crossAt, prevSlope, -tnLen); 
-			px = fxy.x;
-			py = fxy.y;
-			nx = this.next.fx;
-			ny = this.next.fy;
-		} else {
-			// they are, amazingly, the same
+		var pPrev, pNext;
+		if (crossAt) {
+			pPrev = paramLine(prevL, crossAt);
+			pNext = paramLine(nextL, crossAt);
 		}
 
-		var prevNormal = prevSlope + Math.PI/2;
-		var nextNormal = nextSlope + Math.PI/2;
-		var prevNL = [ px, py, px + len * Math.cos(prevNormal), py + len * Math.sin(prevNormal) ];
-		var nextNL = [ nx, ny, nx - len * Math.cos(nextNormal), ny - len * Math.sin(nextNormal) ];
-		
-		// the normals must cross at the center of the circle
-		var center = linesIntersect(prevNL, nextNL, true);
-		var rad = lineLength([ px, py, center.x, center.y ]); // could also use nx, ny
+		if (crossAt && pPrev > 0 && pNext > 0) { // the crossing happens in a "convenient" place and some single arc can connect them
+			var fpLen = lineLength([ this.prev.tx, this.prev.ty, crossAt.x, crossAt.y ]);
+			var tnLen = lineLength([ crossAt.x, crossAt.y, this.next.fx, this.next.fy]);
 
-		// now we are able to deduce the subtended angles for each of these ...
-		var prevAng = Math.atan2(py - center.y, px - center.x);
-		var nextAng = Math.atan2(ny - center.y, nx - center.x);
+			var px, py, nx, ny;
+			if (fpLen < tnLen) {
+				px = this.prev.tx;
+				py = this.prev.ty;
+				var txy = moveAlong(crossAt, nextSlope, fpLen); 
+				nx = txy.x;
+				ny = txy.y;
+			} else if (tnLen < fpLen) {
+				var fxy = moveAlong(crossAt, prevSlope, -tnLen); 
+				px = fxy.x;
+				py = fxy.y;
+				nx = this.next.fx;
+				ny = this.next.fy;
+			} else {
+				// they are, amazingly, the same
+			}
 
-		var clockwise = Math.sin(nextAng-prevAng) < 0;
+			var prevNormal = prevSlope + Math.PI/2;
+			var nextNormal = nextSlope + Math.PI/2;
+			var prevNL = [ px, py, px + len * Math.cos(prevNormal), py + len * Math.sin(prevNormal) ];
+			var nextNL = [ nx, ny, nx - len * Math.cos(nextNormal), ny - len * Math.sin(nextNormal) ];
+			
+			// the normals must cross at the center of the circle
+			var center = linesIntersect(prevNL, nextNL, true);
+			var rad = lineLength([ px, py, center.x, center.y ]); // could also use nx, ny
 
+			// now we are able to deduce the subtended angles for each of these ...
+			var prevAng = Math.atan2(py - center.y, px - center.x);
+			var nextAng = Math.atan2(ny - center.y, nx - center.x);
+
+			var clockwise = Math.sin(nextAng-prevAng) < 0;
+			var pts = this.figurePts(clockwise);
+
+			this.arcs.push({ center, from: prevAng, to: nextAng, irad: rad-1, orad: rad+1, clockwise, pts });
+			// this.arcs.push({ construction: true, center, prevNL, nextNL, from: prevAng, to: nextAng, clockwise, prevL, nextL, crossAt, px, py, nx, ny });
+		} else {
+			// we need a S bend to connect them
+			var prevNormal = prevSlope + Math.PI/2;
+			var nextNormal = nextSlope + Math.PI/2;
+			var rad=400, dist=0, cl;
+			for (var rc=0;rc<20 && Math.abs(dist-rad)>0.01;rc++) {
+				rad = dist;
+				var c1 = moveAlong({ x: this.prev.tx, y: this.prev.ty }, prevNormal, -rad);
+				var c2 = moveAlong({ x: this.next.fx, y: this.next.fy }, nextNormal, rad);
+				cl = [c1.x, c1.y, c2.x, c2.y];
+				dist = lineLength(cl)/2;
+				// console.log("rc:", rc, "rad =", rad, "centers", cl, "dist", dist);
+			}
+			var inflexion = paramOf(cl, 0.5);
+			// console.log("inflects at", inflexion);
+
+			var paf = Math.atan2(this.prev.ty - c1.y, this.prev.tx - c1.x);
+			var pat = Math.atan2(inflexion.y - c1.y, inflexion.x - c1.x);
+			var naf = Math.atan2(inflexion.y - c2.y, inflexion.x - c2.x);
+			var nat = Math.atan2(this.next.fy - c2.y, this.next.fx - c2.x);
+
+			var clock1 = Math.sin(pat-paf) < 0;
+			var clock2 = Math.sin(nat-naf) < 0;
+			// console.log("angles", paf, pat, clock1, naf, nat, clock2);
+
+			var pts = this.figurePts(clock1);
+			pts.toInner = { x: c1.x + Math.cos(pat) * (rad-1), y: c1.y + Math.sin(pat)* (rad-1) };
+			pts.toOuter = { x: c1.x + Math.cos(pat) * (rad+1), y: c1.y + Math.sin(pat)* (rad+1) };
+
+			this.arcs.push({ center: c1, from: paf, to: pat, irad: rad-1, orad: rad+1, clockwise: clock1, pts });
+			// this.arcs.push({ construction: true, center: c1, centerRad: rad*0.9, from: paf, to: pat, clockwise: clock1, prevL, nextL, crossAt, px: this.prev.tx, py: this.prev.ty, nx: inflexion.x, ny: inflexion.y });
+
+			var pts = this.figurePts(clock2);
+			pts.fromInner = { x: c2.x + Math.cos(naf) * (rad-1), y: c2.y + Math.sin(naf)* (rad-1) };
+			pts.fromOuter = { x: c2.x + Math.cos(naf) * (rad+1), y: c2.y + Math.sin(naf)* (rad+1) };
+
+			this.arcs.push({ center: c2, from: naf, to: nat, irad: rad-1, orad: rad+1, clockwise: clock2, pts });
+			// this.arcs.push({ construction: true, center: c2, centerRad: rad*0.9, centerLine: cl, prevNL, nextNL, from: naf, to: nat, clockwise: clock1, prevL, nextL, crossAt, px: inflexion.x, py: inflexion.y, nx: this.next.fx, ny: this.next.fy  });
+		}
+	}
+
+	figurePts(clockwise) {
 		var fromOuter = { x: this.prev.pts[2], y: this.prev.pts[3] };
 		var fromInner = { x: this.prev.pts[4], y: this.prev.pts[5] };
 		var toInner = { x: this.next.pts[6], y: this.next.pts[7] };
@@ -407,7 +459,9 @@ class TrackCurve {
 			toOuter = tmp;
 		}
 
-		var pts = {
+		// TODO: surely fromInnerArc and toInnerArc need to be set?
+		// although maybe not if we are just doing a lineTo and "arcTo" already does that.
+		return {
 			fromOuter,
 			fromInner,
 			fromInnerArc: { },
@@ -415,9 +469,6 @@ class TrackCurve {
 			toOuter,
 			toOuterArc: { }
 		};
-
-		this.arcs.push({ center, from: prevAng, to: nextAng, irad: rad-1, orad: rad+1, clockwise, pts });
-		// this.arcs.push({ construction: true, center, prevNL, nextNL, from: prevAng, to: nextAng, clockwise, prevL, nextL, crossAt, px, py, nx, ny });
 	}
 
 	render(render) {

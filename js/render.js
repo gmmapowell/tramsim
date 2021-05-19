@@ -79,15 +79,28 @@ class Render {
 	}
 
 	fillArc(arc) {
-		var center = this.mapCoord(arc.center.x, arc.center.y);
+		var center;
+		if (arc.center)
+			center = this.mapCoord(arc.center.x, arc.center.y);
 		if (arc.construction) {
 			// this is for debugging and does not contain an actual arc
-			this.gc.beginPath();
+			if (center) {
+				var rad = arc.centerRad;
+				if (!rad)
+					rad = 12;
+				this.gc.beginPath();
+				this.gc.arc(center.x, center.y, rad*scale, 0, Math.PI*2, true);
+				this.gc.stroke();
+			}
 
-			this.gc.arc(center.x, center.y, 12*scale, 0, Math.PI*2, true);
-			this.gc.stroke();
-
 			this.gc.beginPath();
+			if (arc.centerLine) {
+				var p1 = this.mapCoord(arc.centerLine[0], arc.centerLine[1]);
+				var p2 = this.mapCoord(arc.centerLine[2], arc.centerLine[3]);
+				this.gc.moveTo(p1.x, p1.y);
+				this.gc.lineTo(p2.x, p2.y);
+			}
+
 			var p1 = this.mapCoord(arc.prevL[0], arc.prevL[1]);
 			var p2 = this.mapCoord(arc.prevL[2], arc.prevL[3]);
 			this.gc.moveTo(p1.x, p1.y);
@@ -102,11 +115,13 @@ class Render {
 			this.gc.moveTo(c1.x+10*scale, c1.y);
 			this.gc.arc(c1.x, c1.y, 10*scale, 0, 2*Math.PI);
 
-			var p = this.mapCoord(arc.px, arc.py);
-			var n = this.mapCoord(arc.nx, arc.ny);
-			this.gc.moveTo(p.x, p.y);
-			this.gc.lineTo(center.x, center.y);
-			this.gc.lineTo(n.x, n.y);
+			if (arc.px && arc.nx) {
+				var p = this.mapCoord(arc.px, arc.py);
+				var n = this.mapCoord(arc.nx, arc.ny);
+				this.gc.moveTo(p.x, p.y);
+				this.gc.lineTo(center.x, center.y);
+				this.gc.lineTo(n.x, n.y);
+			}
 
 			this.gc.stroke();
 			return;
