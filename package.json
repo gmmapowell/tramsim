@@ -1,0 +1,14 @@
+{
+	"name": "tramsim",
+	"version": "1.0.0",
+	"description": "The plan is to have a tram simulator, but I'm nowhere close yet",
+	"type": "module",
+	"scripts": {
+	  "test": "mocha test/unit/*.spec.js"
+	},
+	"devDependencies": {
+	  "mocha": "^10.2.0",
+	  "chai": "^4.3.8"
+	}
+}
+  
