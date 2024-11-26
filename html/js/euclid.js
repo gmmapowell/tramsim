@@ -43,8 +43,15 @@ class EuclidPlane {
 		var bisector = ModAngle.add((th1 + th2)/2, Math.PI/2);
 		console.log("bisector =", bisector);
 
+		// I think it's diff I want, and I deffo want secant, because
+		// I want 1 when the lines are on the same slope (I think of this as "0")
+		// I want root(2) when they are perpendicular (I think of this as "90")
+		// I want to panic when the do a U-turn (I think of this as "180")
+		var diff = (th1-th2)/2;
+		console.log("bs =", diff, 1/Math.cos(diff));
+
 		// Then (somehow) we can figure out what the center of the imaginary circle will be
-		var ext = rad/Math.sin(bisector);
+		var ext = rad/Math.cos(diff);
 		console.log("ext =", ext, 1);
 		var cx = ModAngle.dp3(s1.toX + Math.cos(bisector)*ext);
 		var cy = ModAngle.dp3(s1.toY + Math.sin(bisector)*ext);
