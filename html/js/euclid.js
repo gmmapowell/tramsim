@@ -35,15 +35,40 @@ class EuclidPlane {
 		if (!(s2 instanceof EuclidLineSegment))
 			throw new Error("segment 2 is not a line");
 
-		// All of this is hacked in here ...
-
+		// Figure out what the angles of the two lines are currently
 		var th1 = s1.slopeAngle();
 		var th2 = s2.slopeAngle();
 
+		// Now figure out what the angle will be of the line bisecting these
+		var bisector = ModAngle.add((th1 + th2)/2, Math.PI/2);
+		console.log("bisector =", bisector);
+
+		// Then (somehow) we can figure out what the center of the imaginary circle will be
+		var ext = rad/Math.sin(bisector);
+		console.log("ext =", ext, 1);
+		var cx = ModAngle.dp3(s1.toX + Math.cos(bisector)*ext);
+		var cy = ModAngle.dp3(s1.toY + Math.sin(bisector)*ext);
+		console.log("cx =", cx, "cy =", cy);
+
+		// Calculate the start and end angles for the curve
+		var from = ModAngle.add(th1, -Math.PI/2);
+		var to = ModAngle.add(th2, -Math.PI/2);
+
+		// And thus the points at which the "circle" intersects the straight lines
+
+		var sx = ModAngle.dp3(cx + Math.cos(from) * rad);
+		var sy = ModAngle.dp3(cy + Math.sin(from) * rad);
+		var dx = ModAngle.dp3(cx + Math.cos(to) * rad);
+		var dy = ModAngle.dp3(cy + Math.sin(to) * rad);
+
 		// Figure out what the curve will be
-		var curve = new EuclidCurveSegment(this.currShape.last(), rad, ModAngle.add(th1, -Math.PI/2), ModAngle.add(th2, -Math.PI/2), s1.toX, s1.toY+rad);
-		// Adjust the line segments to match
-		s1.toX -= rad;
+		var curve = new EuclidCurveSegment(this.currShape.last(), rad, from, to, dx, dy);
+
+		// Adjust the previous line segment to match
+		s1.toX = sx;
+		s1.toY = sy;
+
+		// splice this curve into the shape
 		this.currShape.segments.splice(len-1, 0, curve);
 	}
 }
@@ -119,6 +144,10 @@ class ModAngle {
 
 	static add(angle, delta) {
 		return this.limit(angle+delta);
+	}
+
+	static dp3(num) {
+		return Math.round(num*1000)/1000.0;
 	}
 }
 
