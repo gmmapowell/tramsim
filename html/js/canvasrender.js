@@ -26,20 +26,26 @@ class CanvasRender {
 
 	constructionCircle(cx, cy, rad, cinfo) {
 		var lw = this.cx.lineWidth;
-		this.cx.beginPath();
 		this.cx.lineWidth = 1;
 		var center = this.translate(cx, cy);
+
+		this.cx.beginPath();
 		this.cx.arc(center.x, center.y, 0.25*this.rat, -Math.PI, Math.PI);
 		this.cx.fill();
+
 		this.cx.beginPath();
 		this.cx.arc(center.x, center.y, rad*this.rat, -Math.PI, Math.PI);
 		this.cx.stroke();
 
 		this.cx.beginPath();
+		this.cx.arc(center.x, center.y, cinfo.ext*this.rat, -Math.PI, Math.PI);
+		this.cx.stroke();
+
+		this.cx.beginPath();
 		this.cx.moveTo(center.x, center.y);
 		var ba = cinfo.bisector;
-		var bx = Math.cos(ba) * rad;
-		var by = Math.sin(ba) * rad;
+		var bx = Math.cos(ba) * cinfo.ext;
+		var by = Math.sin(ba) * cinfo.ext;
 		var to = this.translate(cx - bx, cy - by);
 		this.cx.lineTo(to.x, to.y);
 		this.cx.stroke();
@@ -47,8 +53,8 @@ class CanvasRender {
 		this.cx.beginPath();
 		this.cx.moveTo(center.x, center.y);
 		var ba = cinfo.from;
-		var bx = Math.cos(ba) * rad;
-		var by = Math.sin(ba) * rad;
+		var bx = Math.cos(ba) * cinfo.ext;
+		var by = Math.sin(ba) * cinfo.ext;
 		var to = this.translate(cx + bx, cy + by);
 		this.cx.lineTo(to.x, to.y);
 		this.cx.stroke();
@@ -56,8 +62,8 @@ class CanvasRender {
 		this.cx.beginPath();
 		this.cx.moveTo(center.x, center.y);
 		var ba = cinfo.to;
-		var bx = Math.cos(ba) * rad;
-		var by = Math.sin(ba) * rad;
+		var bx = Math.cos(ba) * cinfo.ext;
+		var by = Math.sin(ba) * cinfo.ext;
 		var to = this.translate(cx + bx, cy + by);
 		this.cx.lineTo(to.x, to.y);
 		this.cx.stroke();
@@ -86,7 +92,7 @@ class CanvasRender {
 	curve(cx, cy, from, to, rad, clock, fx, fy) {
 		var pt = this.translate(cx,cy);
 		var col = this.colors[this.colIdx++];
-		console.log("curve centered at ", pt, col);
+		console.log("curve centered at ", pt, "with rad", rad, col);
 		this.cx.strokeStyle = col;
 		this.cx.arc(pt.x, pt.y, rad * this.rat, -from, -to, clock);
 		this.cx.stroke();

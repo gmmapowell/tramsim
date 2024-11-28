@@ -83,17 +83,17 @@ class EuclidPlane {
 		else
 			pct = (is.x-cx)/(rx-cx);
 		console.log("pct = ", pct);
-		ext *= pct;
+		var ext1 = ext*pct;
 
 		// And thus the points at which the "circle" intersects the straight lines
 
-		var sx = ModAngle.dp3(cx + Math.cos(from) * ext);
-		var sy = ModAngle.dp3(cy + Math.sin(from) * ext);
-		var dx = ModAngle.dp3(cx + Math.cos(to) * ext);
-		var dy = ModAngle.dp3(cy + Math.sin(to) * ext);
+		var sx = ModAngle.dp3(cx + Math.cos(from) * ext1);
+		var sy = ModAngle.dp3(cy + Math.sin(from) * ext1);
+		var dx = ModAngle.dp3(cx + Math.cos(to) * ext1);
+		var dy = ModAngle.dp3(cy + Math.sin(to) * ext1);
 
 		// Figure out what the curve will be
-		var curve = new EuclidCurveSegment(this.currShape.last(), cx, cy, ext, from, to, clock, dx, dy, { bisector, from, to });
+		var curve = new EuclidCurveSegment(this.currShape.last(), cx, cy, ext1, from, to, clock, dx, dy, { bisector, from, to, ext });
 
 		// Adjust the previous line segment to match
 		s1.toX = sx;
@@ -104,9 +104,9 @@ class EuclidPlane {
 	}
 
 	render(to) {
-		// for (var s of this.shapes) {
-		// 	s.construct(to);
-		// }
+		for (var s of this.shapes) {
+			s.construct(to);
+		}
 		for (var s of this.shapes) {
 			s.render(to);
 		}

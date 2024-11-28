@@ -31,6 +31,27 @@ function loadSample(sample, plane) {
 			plane.interpolateRadius(2);
 			return { lx: 10, rx: 35, ly: 10, ty: 20 };
 		}
+		case 5: {
+			plane.pathFrom(15, 5);
+			plane.lineTo(25, 10);
+			plane.lineTo(33, 7);
+			plane.interpolateRadius(2);
+			return { lx: 10, rx: 35, ly: 0, ty: 20 };
+		}
+		case 6: { // very acute angle
+			plane.pathFrom(0, 0);
+			plane.lineTo(10, 0);
+			plane.lineTo(0, 3);
+			plane.interpolateRadius(1);
+			return { lx: 0, rx: 10, ly: 0, ty: 5 };
+		}
+		case 7: { // obtuse angle
+			plane.pathFrom(0, 0);
+			plane.lineTo(5, 0);
+			plane.lineTo(10, 3);
+			plane.interpolateRadius(3);
+			return { lx: 0, rx: 10, ly: 0, ty: 5 };
+		}
 		default: {
 			console.log("there is no sample", sample);
 			return null;
