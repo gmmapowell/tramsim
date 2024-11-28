@@ -83,7 +83,7 @@ describe('Drawing in a Plane', () => {
 		var l1 = s1.segments[1];
 		var c1 = s1.segments[2];
 		expect(c1.rad).to.equal(5);
-		expect(c1.from).to.equal(          Math.PI);
+		expect(c1.from).to.equal(Math.PI);
 		expect(c1.to).to.equal(Math.PI/2);
 
 		expect(l1.toX).to.equal(10);
@@ -94,5 +94,32 @@ describe('Drawing in a Plane', () => {
 		var l2 = s1.segments[3];
 		expect(l2.toX).to.equal(20);
 		expect(l2.toY).to.equal(10);
+	});
+
+	it('we can interpolate a rh curve between a NE-ish line and a SE-ish line', () => {
+		plane.pathFrom(15, 5);
+		plane.lineTo(25, 10);
+		plane.lineTo(33, 7);
+		plane.interpolateRadius(2);
+		expect(plane.shapes.length).to.equal(1);
+		var s1 = plane.shapes[0];
+		expect(s1.segments.length).to.equal(4);
+		var m0 = s1.segments[0];
+		expect(m0.toX).to.equal(15);
+		expect(m0.toY).to.equal(5);
+		var l1 = s1.segments[1];
+		var c1 = s1.segments[2];
+		expect(c1.rad).to.equal(2);
+		expect(c1.from).to.be.within(2, 2.1);
+		expect(c1.to).to.be.within(1.2,1.3);
+
+		expect(l1.toX).to.be.within(24, 25);
+		expect(l1.toY).to.be.within(6.5,7);
+
+		expect(c1.toX).to.be.within(25, 26);
+		expect(c1.toY).to.be.within(6.5,7);
+		var l2 = s1.segments[3];
+		expect(l2.toX).to.equal(33);
+		expect(l2.toY).to.equal(7);
 	});
 });

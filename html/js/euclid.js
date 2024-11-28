@@ -105,6 +105,10 @@ class EuclidShape {
 			back = 1;
 		return this.segments[this.segments.length-back];
 	}
+
+	toString() {
+		return this.segments.toString();
+	}
 }
 
 class EuclidPoint {
@@ -135,6 +139,10 @@ class EuclidLineSegment {
 
 		// TODO: need to consider |th1| > Math.PI/2
 		return th1;
+	}
+
+	toString() {
+		return "LineTo["+this.toX+","+this.toY+"]";
 	}
 }
 
