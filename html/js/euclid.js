@@ -39,15 +39,21 @@ class EuclidPlane {
 		var th1 = s1.slopeAngle();
 		var th2 = s2.slopeAngle();
 
+		// The first line is "coming into" the junction, so we need to flip the angle to be the angle
+		// that a ray would be "leaving" the junction before we can do vector maths.
+		var rth1 = ModAngle.add(th1, Math.PI);
+		console.log("th1 =", th1, "th2 =", th2, "rth1", rth1);
+
 		// Now figure out what the angle will be of the line bisecting these
-		var bisector = ModAngle.add((th1 + th2)/2, Math.PI/2);
+		var bisector = ModAngle.limit((rth1 + th2) / 2);
+		// var bisector = ModAngle.add((th1 + th2)/2, addOn);
 		console.log("bisector =", bisector);
 
 		// I think it's diff I want, and I deffo want secant, because
 		// I want 1 when the lines are on the same slope (I think of this as "0")
 		// I want root(2) when they are perpendicular (I think of this as "90")
 		// I want to panic when the do a U-turn (I think of this as "180")
-		var diff = (th1-th2)/2;
+		var diff = (rth1-th2)/2;
 		console.log("bs =", diff, 1/Math.cos(diff));
 
 		// Then (somehow) we can figure out what the center of the imaginary circle will be
@@ -58,8 +64,11 @@ class EuclidPlane {
 		console.log("cx =", cx, "cy =", cy);
 
 		// Calculate the start and end angles for the curve
-		var from = ModAngle.add(th1, -Math.PI/2);
-		var to = ModAngle.add(th2, -Math.PI/2);
+		var dir = Math.PI/2;
+		if (bisector > 0)
+			dir = -dir;
+		var from = ModAngle.add(th1, dir);
+		var to = ModAngle.add(th2, dir);
 
 		// And thus the points at which the "circle" intersects the straight lines
 
