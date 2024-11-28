@@ -77,7 +77,11 @@ class EuclidPlane {
 
 		var is = s1.intersect(cx, cy, rx, ry);
 		console.log("intersect at", is);
-		var pct = (is.x-cx)/(rx-cx);
+		var pct;
+		if (rx == cx)
+			pct = (is.y-cy)/(ry-cy);
+		else
+			pct = (is.x-cx)/(rx-cx);
 		console.log("pct = ", pct);
 		ext *= pct;
 
@@ -184,14 +188,27 @@ class EuclidLineSegment {
 
 	// where does this line intersect a line from (fx,fy) to (tx,ty)
 	intersect(fx, fy, tx, ty) {
+		if (this.toX == this.start.toX) {
+			// we are a vertical line
+			// obviously, the intersection must be at this.toX
+			var b = (ty-fy)/(tx-fx);
+			var d = ty-b*tx;
+			return { x: this.toX, y: b*this.toX + d };
+		}
+		if (tx == fx) {
+			// we intersect a vertical line
+			// obviously, the intersection must be at fx
+			var a = this.slope();
+			var c = this.start.toY - a*this.start.toX;
+			return { x: tx, y: a*tx + c };
+		}
 		var a = this.slope();
 		var b = (ty-fy)/(tx-fx);
 		var c = this.start.toY - a*this.start.toX;
 		var d = ty-b*tx;
-		console.log(a, c, b, d);
+		console.log("acbd", a, c, b, d);
 		var ix = (d-c) / (a-b);
 		var iy = a*ix+c;
-		console.log(ix, iy);
 		return { x: ix, y: iy };
 	}
 
