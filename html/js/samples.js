@@ -38,12 +38,12 @@ function loadSample(sample, plane) {
 			plane.interpolateRadius(2);
 			return { lx: 10, rx: 35, ly: 0, ty: 20 };
 		}
-		case 6: { // very acute angle
+		case 6: { // very acute angle - should explode because we need to go back beyond the zero point
 			plane.pathFrom(0, 0);
 			plane.lineTo(10, 0);
 			plane.lineTo(0, 3);
 			plane.interpolateRadius(1);
-			return { lx: 0, rx: 10, ly: 0, ty: 5 };
+			return { lx: -10, rx: 10, ly: -1, ty: 5 };
 		}
 		case 7: { // obtuse angle
 			plane.pathFrom(0, 0);

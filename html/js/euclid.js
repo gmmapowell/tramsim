@@ -54,8 +54,9 @@ class EuclidPlane {
 		// junction point (s1.toX, s1.toY) of the two lines in on the circle in such a way that the tangent
 		// to the circle is perpendicular to the bisector.  To do this, we find the secant
 		// of the angle between the two lines (the sign is immaterial because sec and cos are the same in both directions)
-		var diff = (rth1-th2)/2;
-		var ext = rad/Math.cos(diff);
+		debugger;
+		var diff = Math.abs((rth1-th2)/2);
+		var ext = rad/Math.sin(diff/2);
 		var cx = ModAngle.dp3(s1.toX + Math.cos(bisector)*ext);
 		var cy = ModAngle.dp3(s1.toY + Math.sin(bisector)*ext);
 		console.log("sec =", ext, "cx =", cx, "cy =", cy);
@@ -87,13 +88,13 @@ class EuclidPlane {
 
 		// And thus the points at which the "circle" intersects the straight lines
 
-		var sx = ModAngle.dp3(cx + Math.cos(from) * ext1);
-		var sy = ModAngle.dp3(cy + Math.sin(from) * ext1);
-		var dx = ModAngle.dp3(cx + Math.cos(to) * ext1);
-		var dy = ModAngle.dp3(cy + Math.sin(to) * ext1);
+		var sx = ModAngle.dp3(cx + Math.cos(from) * rad);
+		var sy = ModAngle.dp3(cy + Math.sin(from) * rad);
+		var dx = ModAngle.dp3(cx + Math.cos(to) * rad);
+		var dy = ModAngle.dp3(cy + Math.sin(to) * rad);
 
 		// Figure out what the curve will be
-		var curve = new EuclidCurveSegment(this.currShape.last(), cx, cy, ext1, from, to, clock, dx, dy, { bisector, from, to, ext });
+		var curve = new EuclidCurveSegment(this.currShape.last(), cx, cy, rad, from, to, clock, dx, dy, { bisector, from, to, ext });
 
 		// Adjust the previous line segment to match
 		s1.toX = sx;
