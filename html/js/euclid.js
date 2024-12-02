@@ -54,8 +54,7 @@ class EuclidPlane {
 		// junction point (s1.toX, s1.toY) of the two lines in on the circle in such a way that the tangent
 		// to the circle is perpendicular to the bisector.  To do this, we find the secant
 		// of the angle between the two lines (the sign is immaterial because sec and cos are the same in both directions)
-		debugger;
-		var diff = Math.abs((rth1-th2)/2);
+		var diff = Math.abs(rth1-th2);
 		var ext = rad/Math.sin(diff/2);
 		var cx = ModAngle.dp3(s1.toX + Math.cos(bisector)*ext);
 		var cy = ModAngle.dp3(s1.toY + Math.sin(bisector)*ext);

@@ -56,7 +56,7 @@ describe('Drawing in a Plane', () => {
 		expect(m0.toY).to.equal(0);
 		var l1 = s1.segments[1];
 		var c1 = s1.segments[2];
-		expect(c1.rad).to.be.within(2.99, 3.01);
+		expect(c1.rad).to.equal(3);
 		expect(c1.from).to.equal(-Math.PI/2);
 		expect(c1.to).to.equal(0);
 		expect(c1.clock).to.be.true;
@@ -83,7 +83,7 @@ describe('Drawing in a Plane', () => {
 		expect(m0.toY).to.equal(0);
 		var l1 = s1.segments[1];
 		var c1 = s1.segments[2];
-		expect(c1.rad).to.be.within(5, 5.01);
+		expect(c1.rad).to.equal(5);
 		expect(c1.from).to.equal(Math.PI);
 		expect(c1.to).to.equal(Math.PI/2);
 		expect(c1.clock).to.be.false;
@@ -111,15 +111,15 @@ describe('Drawing in a Plane', () => {
 		expect(m0.toY).to.equal(5);
 		var l1 = s1.segments[1];
 		var c1 = s1.segments[2];
-		expect(c1.rad).to.be.within(4.5,4.6);
+		expect(c1.rad).to.equal(2);
 		expect(c1.from).to.be.within(2, 2.1);
 		expect(c1.to).to.be.within(1.2,1.3);
 		expect(c1.clock).to.be.false;
 
-		expect(l1.toX).to.be.within(23.2, 23.3);
-		expect(l1.toY).to.be.within(9.1,9.2);
+		expect(l1.toX).to.be.within(24.2, 24.3);
+		expect(l1.toY).to.be.within(9.6,9.7);
 
-		expect(c1.toX).to.be.within(26, 27);
+		expect(c1.toX).to.be.within(25.8, 25.9);
 		expect(c1.toY).to.be.within(9,10);
 		var l2 = s1.segments[3];
 		expect(l2.toX).to.equal(33);
