@@ -69,28 +69,13 @@ class EuclidPlane {
 		var to = ModAngle.add(th2, dir);
 		var clock = ModAngle.limit(to-from) > 0;
 
-		// Close, but no cigar.  This "circle" intersects with the junction point NOT with the start and end points we want.
-		// We need it to have a smaller radius.  We can figure this out by identifying where (either of) the radius lines
-		// intersects the original line, and thus figuring out the amount we need to shrink it.
-		var rx = ModAngle.dp3(cx + Math.cos(from) * ext); // figure out where the radius to l1 ends with the current guess at the radius
-		var ry = ModAngle.dp3(cy + Math.sin(from) * ext);
-
-		var is = s1.intersect(cx, cy, rx, ry);
-		console.log("intersect at", is);
-		var pct;
-		if (rx == cx)
-			pct = (is.y-cy)/(ry-cy);
-		else
-			pct = (is.x-cx)/(rx-cx);
-		console.log("pct = ", pct);
-		var ext1 = ext*pct;
-
-		// And thus the points at which the "circle" intersects the straight lines
-
 		var sx = ModAngle.dp3(cx + Math.cos(from) * rad);
 		var sy = ModAngle.dp3(cy + Math.sin(from) * rad);
 		var dx = ModAngle.dp3(cx + Math.cos(to) * rad);
 		var dy = ModAngle.dp3(cy + Math.sin(to) * rad);
+
+		if (!s1.containsPoint(sx, sy))
+			throw new Error("no");
 
 		// Figure out what the curve will be
 		var curve = new EuclidCurveSegment(this.currShape.last(), cx, cy, rad, from, to, clock, dx, dy, { bisector, from, to, ext });
@@ -184,6 +169,15 @@ class EuclidLineSegment {
 
 		// TODO: need to consider |th1| > Math.PI/2
 		return th1;
+	}
+
+	// does the line SEGMENT contain point (x,y) or is it before/after the SEGMENT
+	containsPoint(x, y) {
+		if ((x < this.start.toX && x < this.toX) || (x > this.start.toX && x > this.toX))
+			return false;
+		if ((y < this.start.toY && y < this.toY) || (y > this.start.toY && y > this.toY))
+			return false;
+		return true;
 	}
 
 	// where does this line intersect a line from (fx,fy) to (tx,ty)

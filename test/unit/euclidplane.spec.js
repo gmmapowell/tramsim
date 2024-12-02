@@ -125,4 +125,12 @@ describe('Drawing in a Plane', () => {
 		expect(l2.toX).to.equal(33);
 		expect(l2.toY).to.equal(7);
 	});
+
+
+	it('we cannot have an angle so tight it will cause the curve to start before the previous line has ended', () => {
+		plane.pathFrom(0, 0);
+		plane.lineTo(10, 0);
+		plane.lineTo(0, 3);
+		expect(() => plane.interpolateRadius(1)).to.throw(Error, "radius is too big for the acute angle");
+	});
 });
